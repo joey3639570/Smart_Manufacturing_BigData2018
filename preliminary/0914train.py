@@ -54,14 +54,17 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.classifier(x)
-        return x.unsqueeze()
+        return x
 
 def train(net, device, train_loader, optimizer, epoch):
     net.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = V(data), V(target)
         optimizer.zero_grad()
+        print('target : ',target.size())
+        target = target.view(batch_size,1)
         output = net(data)
+        print('output : ',output.size())
         loss = F.mse_loss(output, target)
         loss.backward()
         optimizer.step()
@@ -78,6 +81,7 @@ def test(net, device, test_loader):
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = net(data)
+            target = target.view(batch_size,1)
             test_loss += F.mse_loss(output, target, reduction='sum').item() # sum up batch loss
             pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
