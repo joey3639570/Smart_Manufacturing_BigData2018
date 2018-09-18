@@ -85,6 +85,10 @@ def test(net, device, test_loader):
     test_loss /= len(test_loader.dataset)
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
 
+def restore_net():
+    # restore entire net1 to net2
+    net2 = torch.load('net.pkl')
+
 def main():
     device = t.device("cpu")
     #Data Loader (Input Pipeline)
@@ -101,6 +105,7 @@ def main():
     for epoch in range(1, num_epochs + 1):
         train(net, device, train_loader, optimizer, epoch)
         test(net, device, test_loader)
+    torch.save(net, 'net.pkl')
 
 if __name__ == '__main__':
     main()
