@@ -25,7 +25,7 @@ encoder = LabelEncoder()
 encoder.fit(Y)
 Y = encoder.transform(Y)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=0)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
 X_train, Y_train =t.FloatTensor(X_train), t.FloatTensor(Y_train)
 X_test, Y_test =t.FloatTensor(X_test), t.FloatTensor(Y_test)
 
@@ -61,10 +61,8 @@ def train(net, device, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = V(data), V(target)
         optimizer.zero_grad()
-        print('target : ',target.size())
         target = target.view(batch_size,1)
         output = net(data)
-        print('output : ',output.size())
         loss = F.mse_loss(output, target)
         loss.backward()
         optimizer.step()
@@ -83,13 +81,9 @@ def test(net, device, test_loader):
             output = net(data)
             target = target.view(batch_size,1)
             test_loss += F.mse_loss(output, target, reduction='sum').item() # sum up batch loss
-            pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
 
 def main():
     device = t.device("cpu")
